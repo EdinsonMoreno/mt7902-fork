@@ -23,6 +23,8 @@ This fork includes the following fixes on top of upstream:
 
 - **Build failure on kernel >= 6.17** ([commit ca26d5a](../../commit/ca26d5a)): `pp_page_to_nmdesc()` was introduced in 6.13 and removed in 6.17 in favour of `__netmem_get_pp()` + `page_to_netmem()`. The previous guard used `pp_page_to_nmdesc` under `>= 6.17`, causing a build error on that exact version. Replaced with a three-way guard covering `>= 6.17`, `>= 6.13`, and `< 6.13`. (Based on [PR #14](https://github.com/hmtheboy154/mt7902/pull/14) by [@georgettica](https://github.com/georgettica).)
 
+- **Security hardening** ([commit 8147a3e](../../commit/8147a3e)): Multiple security fixes from a full audit of the codebase: TLV length validation before `memcpy` in the firmware capability parser (OOB read, CWE-125); upper bound on ACPI `package.count` before `devm_kzalloc` (CWE-789); `array_size()` for DMA queue allocations (CWE-190); `debugfs_create_file_unsafe` replaced with safe variant (CWE-362); `module_param` permissions tightened to `0444`; ACPI SAR integer range validated before `u8` cast; firmware integrity verification via `SHA256SUMS` on `make install_fw`; `.gitignore` updated to cover sensitive file types; `KVER` validated in Makefile to prevent path traversal.
+
 ## Installation
 
 > [!IMPORTANT]
