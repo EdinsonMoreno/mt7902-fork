@@ -70,6 +70,4 @@ sudo make uninstall_fw
 
 Once you got the driver & firmware installed, reboot to see changes.
 
-## Feedback
 
-If you have any issue using this driver, please provide feedback in this [Discord group](https://discord.gg/JGhjAxEFhz).
