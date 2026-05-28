@@ -11,7 +11,17 @@ This is basically the mainline version of mt76 with [patches to support MT7902](
 
 ## Status
 
-The driver supports kernel 6.6~6.19 (and might be 7.0 soon) and is usable according to users reported in this [spreadsheet](https://docs.google.com/spreadsheets/d/1G2mQEeLQAu4oB85G-y4A9OduA1ZP0rUcY-b6MRnZhFU/edit?usp=drive_link&pli=1&authuser=0). 
+The driver supports kernel 6.6+ (including 7.0) and is usable according to users reported in this [spreadsheet](https://docs.google.com/spreadsheets/d/1G2mQEeLQAu4oB85G-y4A9OduA1ZP0rUcY-b6MRnZhFU/edit?usp=drive_link&pli=1&authuser=0).
+
+## Patches in this fork
+
+This fork includes the following fixes on top of upstream:
+
+- **`mt76_get_txpower()` reports 0 dBm** ([commit 48a0589](../../commit/48a0589)): On systems where the ACPI SAR table exposes an invalid power limit (`frp[i].power == -1`), `mt76_get_sar_power()` capped TX power at -0.5 dBm, causing the driver to always report 0 dBm. Fixed by falling back to `chan->max_power` (regulatory limit) when `txpower_cur` has not been initialized by firmware.
+
+- **`mt76_vif_phy()` returns NULL, STA insertion fails with -22** ([commit 964b718](../../commit/964b718)): On single-radio setups or during early STA association events, `mlink->ctx` may not be assigned yet. Returning `NULL` propagated as `-EINVAL` to callers, causing `failed to insert STA entry for the AP (error -22)`. Fixed by returning `hw->priv` instead, consistent with the upstream behavior for kernels >= 6.15.
+
+- **Build failure on kernel >= 6.17** ([commit ca26d5a](../../commit/ca26d5a)): `pp_page_to_nmdesc()` was introduced in 6.13 and removed in 6.17 in favour of `__netmem_get_pp()` + `page_to_netmem()`. The previous guard used `pp_page_to_nmdesc` under `>= 6.17`, causing a build error on that exact version. Replaced with a three-way guard covering `>= 6.17`, `>= 6.13`, and `< 6.13`. (Based on [PR #14](https://github.com/hmtheboy154/mt7902/pull/14) by [@georgettica](https://github.com/georgettica).)
 
 ## Installation
 
