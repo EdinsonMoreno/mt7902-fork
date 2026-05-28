@@ -12,7 +12,7 @@
 #define MT_STA_BFEE			BIT(1)
 
 static bool mt7921_disable_clc;
-module_param_named(disable_clc, mt7921_disable_clc, bool, 0644);
+module_param_named(disable_clc, mt7921_disable_clc, bool, 0444);
 MODULE_PARM_DESC(disable_clc, "disable CLC support");
 
 int mt7921_mcu_parse_response(struct mt76_dev *mdev, int cmd,
@@ -597,6 +597,8 @@ static int mt7921_mcu_get_nic_capability(struct mt792x_phy *mphy)
 			phy->cap.has_6ghz = skb->data[0];
 			break;
 		case MT_NIC_CAP_MAC_ADDR:
+			if (len < ETH_ALEN)
+				break;
 			memcpy(phy->macaddr, (void *)skb->data, ETH_ALEN);
 			break;
 		case MT_NIC_CAP_PHY:
@@ -608,6 +610,8 @@ static int mt7921_mcu_get_nic_capability(struct mt792x_phy *mphy)
 							     skb);
 			break;
 		case MT_NIC_CAP_CHIP_CAP:
+			if (len < sizeof(u64))
+				break;
 			memcpy(&mphy->chip_cap, (void *)skb->data, sizeof(u64));
 			break;
 		default:

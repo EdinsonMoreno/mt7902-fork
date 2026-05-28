@@ -1,5 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-only
 KVER ?= $(if $(KERNELRELEASE),$(KERNELRELEASE),$(shell uname -r))
+
+# Validar KVER para prevenir path traversal en MODDESTDIR
+ifneq (,$(findstring ..,$(KVER)))
+  $(error KVER contiene '..' — valor inválido: $(KVER))
+endif
+
 KSRC ?= $(if $(KERNEL_SRC),$(KERNEL_SRC),/lib/modules/$(KVER)/build)
 FWDIR := /lib/firmware/mediatek
 JOBS ?= $(shell nproc --ignore=1)
@@ -50,6 +56,8 @@ endif
 	@depmod $(DEPMOD_ARGS) -a $(KVER)
 
 install_fw:
+	@echo "Verificando integridad del firmware..."
+	@cd firmware && sha256sum -c SHA256SUMS
 ifeq ($(wildcard $(FWDIR)), )
 	@install -vDm 644 -t $(FWDIR) firmware/*.bin
 else

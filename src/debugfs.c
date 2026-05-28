@@ -112,9 +112,9 @@ mt76_register_debugfs_fops(struct mt76_phy *phy,
 
 	debugfs_create_u8("led_pin", 0600, dir, &phy->leds.pin);
 	debugfs_create_u32("regidx", 0600, dir, &dev->debugfs_reg);
-	debugfs_create_file_unsafe("regval", 0600, dir, dev, fops);
-	debugfs_create_file_unsafe("napi_threaded", 0600, dir, dev,
-				   &fops_napi_threaded);
+	debugfs_create_file("regval", 0600, dir, dev, fops);
+	debugfs_create_file("napi_threaded", 0600, dir, dev,
+			    &fops_napi_threaded);
 	debugfs_create_blob("eeprom", 0400, dir, &dev->eeprom);
 	if (dev->otp.data)
 		debugfs_create_blob("otp", 0400, dir, &dev->otp);

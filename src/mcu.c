@@ -79,6 +79,9 @@ int mt76_mcu_skb_send_and_get_msg(struct mt76_dev *dev, struct sk_buff *skb,
 	int ret, seq;
 
 	if (mt76_is_sdio(dev))
+		/* Fast-path check without mutex: intentional TOCTOU for performance.
+		 * A concurrent reset changing these flags between check and lock
+		 * results at worst in a spurious -EIO retry — not a safety issue. */
 		if (test_bit(MT76_RESET, &dev->phy.state) && atomic_read(&dev->bus_hung))
 			return -EIO;
 

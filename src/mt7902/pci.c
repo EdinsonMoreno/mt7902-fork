@@ -39,7 +39,7 @@ static const struct pci_device_id mt7921_pci_device_table[] = {
 };
 
 static bool mt7921_disable_aspm;
-module_param_named(disable_aspm, mt7921_disable_aspm, bool, 0644);
+module_param_named(disable_aspm, mt7921_disable_aspm, bool, 0444);
 MODULE_PARM_DESC(disable_aspm, "disable PCI ASPM support");
 
 static int mt7921e_init_reset(struct mt792x_dev *dev)

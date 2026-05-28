@@ -810,13 +810,14 @@ mt76_dma_alloc_queue(struct mt76_dev *dev, struct mt76_queue *q,
 
 	size = mt76_queue_is_wed_rro_ind(q) ? sizeof(struct mt76_wed_rro_desc)
 					    : sizeof(struct mt76_desc);
-	q->desc = dmam_alloc_coherent(dev->dma_dev, q->ndesc * size,
+	q->desc = dmam_alloc_coherent(dev->dma_dev,
+				      array_size(q->ndesc, size),
 				      &q->desc_dma, GFP_KERNEL);
 	if (!q->desc)
 		return -ENOMEM;
 
 	mt76_dma_queue_magic_cnt_init(dev, q);
-	size = q->ndesc * sizeof(*q->entry);
+	size = array_size(q->ndesc, sizeof(*q->entry));
 	q->entry = devm_kzalloc(dev->dev, size, GFP_KERNEL);
 	if (!q->entry)
 		return -ENOMEM;

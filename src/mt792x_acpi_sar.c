@@ -4,6 +4,8 @@
 #include <linux/acpi.h>
 #include "mt792x.h"
 
+#define MT792x_ASAR_MAX_TABLE_LEN 256
+
 static const char * const cc_list_all[] = {
 	"00", "EU", "AR", "AU", "AZ", "BY", "BO", "BR",
 	"CA", "CL", "CN", "ID", "JP", "MY", "MX", "ME",
@@ -52,6 +54,7 @@ mt792x_acpi_read(struct mt792x_dev *dev, u8 *method, u8 **tbl, u32 *len)
 	sar_root = buf.pointer;
 	if (sar_root->type != ACPI_TYPE_PACKAGE ||
 	    sar_root->package.count < 4 ||
+	    sar_root->package.count > MT792x_ASAR_MAX_TABLE_LEN ||
 	    sar_root->package.elements[0].type != ACPI_TYPE_INTEGER) {
 		dev_err(mdev->dev, "sar cnt = %d\n",
 			sar_root->package.count);
@@ -77,6 +80,10 @@ mt792x_acpi_read(struct mt792x_dev *dev, u8 *method, u8 **tbl, u32 *len)
 		if (sar_unit->type != ACPI_TYPE_INTEGER)
 			break;
 
+		if (sar_unit->integer.value > 0xFF) {
+			ret = -EINVAL;
+			goto free;
+		}
 		*(*tbl + i) = (u8)sar_unit->integer.value;
 	}
 
